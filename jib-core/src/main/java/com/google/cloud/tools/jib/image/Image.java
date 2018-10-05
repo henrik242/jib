@@ -41,6 +41,7 @@ public class Image<T extends Layer> {
     @Nullable private ImmutableList<String> javaArguments;
     @Nullable private ImmutableList<Port> exposedPorts;
     @Nullable private String workingDirectory;
+    @Nullable private String user;
 
     /**
      * Sets the image creation time.
@@ -148,6 +149,17 @@ public class Image<T extends Layer> {
     }
 
     /**
+     * Sets the item in the "User" field in the container configuration.
+     *
+     * @param user the default user (uid and/or gid) to run the container
+     * @return this
+     */
+    public Builder<T> setUser(@Nullable String user) {
+      this.user = user;
+      return this;
+    }
+
+    /**
      * Adds a layer to the image.
      *
      * @param layer the layer to add
@@ -180,7 +192,8 @@ public class Image<T extends Layer> {
           javaArguments,
           exposedPorts,
           labelsBuilder.build(),
-          workingDirectory);
+          workingDirectory,
+          user);
     }
   }
 
@@ -215,6 +228,9 @@ public class Image<T extends Layer> {
   /** Working directory on the container configuration */
   @Nullable private final String workingDirectory;
 
+  /** User on the container configuration */
+  @Nullable private final String user;
+
   private Image(
       @Nullable Instant created,
       ImageLayers<T> layers,
@@ -224,7 +240,8 @@ public class Image<T extends Layer> {
       @Nullable ImmutableList<String> javaArguments,
       @Nullable ImmutableList<Port> exposedPorts,
       @Nullable ImmutableMap<String, String> labels,
-      @Nullable String workingDirectory) {
+      @Nullable String workingDirectory,
+      @Nullable String user) {
     this.created = created;
     this.layers = layers;
     this.history = history;
@@ -234,6 +251,7 @@ public class Image<T extends Layer> {
     this.exposedPorts = exposedPorts;
     this.labels = labels;
     this.workingDirectory = workingDirectory;
+    this.user = user;
   }
 
   @Nullable
@@ -269,6 +287,11 @@ public class Image<T extends Layer> {
   @Nullable
   public String getWorkingDirectory() {
     return workingDirectory;
+  }
+
+  @Nullable
+  public String getUser() {
+    return user;
   }
 
   public ImmutableList<T> getLayers() {

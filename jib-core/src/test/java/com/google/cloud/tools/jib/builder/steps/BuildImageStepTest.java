@@ -121,6 +121,7 @@ public class BuildImageStepTest {
             .addEnvironment(ImmutableMap.of("BASE_ENV", "BASE_ENV_VALUE"))
             .addLabel("base.label", "base.label.value")
             .setWorkingDirectory("/base/working/directory")
+            .setUser("base:user")
             .addHistory(nonEmptyLayerHistory)
             .addHistory(emptyLayerHistory)
             .addHistory(emptyLayerHistory)
@@ -184,10 +185,30 @@ public class BuildImageStepTest {
         ImmutableMap.of("base.label", "base.label.value", "my.label", "my.label.value"),
         image.getLabels());
     Assert.assertEquals("/base/working/directory", image.getWorkingDirectory());
+    Assert.assertEquals("base:user", image.getUser());
 
     Assert.assertEquals(image.getHistory().get(0), nonEmptyLayerHistory);
     Assert.assertEquals(image.getHistory().get(1), emptyLayerHistory);
     Assert.assertEquals(image.getHistory().get(2), emptyLayerHistory);
+  }
+
+  @Test
+  public void testUserSet() throws InterruptedException, ExecutionException {
+    Mockito.when(mockContainerConfiguration.getUser()).thenReturn("configured:user");
+
+    BuildImageStep buildImageStep =
+        new BuildImageStep(
+            MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor()),
+            mockBuildConfiguration,
+            mockPullBaseImageStep,
+            mockPullAndCacheBaseImageLayersStep,
+            ImmutableList.of(
+                mockBuildAndCacheApplicationLayerStep,
+                mockBuildAndCacheApplicationLayerStep,
+                mockBuildAndCacheApplicationLayerStep));
+    Image<Layer> image = buildImageStep.getFuture().get().getFuture().get();
+
+    Assert.assertEquals("configured:user", image.getUser());
   }
 
   @Test

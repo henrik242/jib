@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 
 /** Translates {@link V21ManifestTemplate} and {@link V22ManifestTemplate} into {@link Image}. */
 public class JsonToImageTranslator {
@@ -137,13 +136,8 @@ public class JsonToImageTranslator {
       }
     }
 
-    if (containerConfigurationTemplate.getContainerEntrypoint() != null) {
-      imageBuilder.setEntrypoint(containerConfigurationTemplate.getContainerEntrypoint());
-    }
-
-    if (containerConfigurationTemplate.getContainerCmd() != null) {
-      imageBuilder.setJavaArguments(containerConfigurationTemplate.getContainerCmd());
-    }
+    imageBuilder.setEntrypoint(containerConfigurationTemplate.getContainerEntrypoint());
+    imageBuilder.setJavaArguments(containerConfigurationTemplate.getContainerCmd());
 
     if (containerConfigurationTemplate.getContainerExposedPorts() != null) {
       imageBuilder.setExposedPorts(
@@ -162,6 +156,7 @@ public class JsonToImageTranslator {
     }
 
     imageBuilder.setWorkingDirectory(containerConfigurationTemplate.getContainerWorkingDir());
+    imageBuilder.setUser(containerConfigurationTemplate.getContainerUser());
 
     return imageBuilder.build();
   }
@@ -174,11 +169,8 @@ public class JsonToImageTranslator {
    * @return a list of {@link Port}s
    */
   @VisibleForTesting
-  static ImmutableList<Port> portMapToList(@Nullable Map<String, Map<?, ?>> portMap)
+  static ImmutableList<Port> portMapToList(Map<String, Map<?, ?>> portMap)
       throws BadContainerConfigurationFormatException {
-    if (portMap == null) {
-      return ImmutableList.of();
-    }
     ImmutableList.Builder<Port> ports = new ImmutableList.Builder<>();
     for (Map.Entry<String, Map<?, ?>> entry : portMap.entrySet()) {
       String port = entry.getKey();

@@ -146,6 +146,7 @@ class BuildImageStep
       imageBuilder.addEnvironment(baseImage.getEnvironment());
       imageBuilder.addLabels(baseImage.getLabels());
       imageBuilder.setWorkingDirectory(baseImage.getWorkingDirectory());
+      imageBuilder.setUser(baseImage.getUser());
 
       // Add history elements for non-empty layers that don't have one yet
       Instant layerCreationTime =
@@ -179,6 +180,9 @@ class BuildImageStep
         imageBuilder.setJavaArguments(containerConfiguration.getProgramArguments());
         imageBuilder.setExposedPorts(containerConfiguration.getExposedPorts());
         imageBuilder.addLabels(containerConfiguration.getLabels());
+        if (containerConfiguration.getUser() != null) {
+          imageBuilder.setUser(containerConfiguration.getUser());
+        }
       }
 
       // Gets the container configuration content descriptor.

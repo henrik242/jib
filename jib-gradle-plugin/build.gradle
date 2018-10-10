@@ -25,6 +25,8 @@ compileJava.options.encoding = 'UTF-8'
 repositories {
   // Use jcenter for gradle plugin portal releases.
   jcenter()
+    maven { url "https://plugins.gradle.org/m2/" }
+
 }
 
 sourceSets {
